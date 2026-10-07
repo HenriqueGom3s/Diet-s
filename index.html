@@ -1,298 +1,319 @@
-<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Diet's — Planejamento alimentar</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diet's</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--g:#16a34a;--g2:#15803d;--gl:#dcfce7;--bg:#f6f8f5;--tx:#14231a;--mu:#6b7a70;--r:18px}
-*{box-sizing:border-box;margin:0}
-body{font:15px/1.5 system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--tx)}
-.shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
-nav{background:#fff;border-right:1px solid #e5ebe6;padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
-nav a{display:flex;gap:10px;padding:11px 14px;border-radius:12px;color:var(--mu);cursor:pointer;font-weight:600;transition:.2s}
-nav a:hover{background:var(--gl)}nav a.on{background:var(--g);color:#fff}
-.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;color:var(--g2);margin-bottom:18px}
-main{padding:28px;max-width:1000px;width:100%;animation:fi .35s}
-@keyframes fi{from{opacity:0;transform:translateY(8px)}}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:16px 0}
-.card{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 2px 12px #0001;transition:.2s}
-.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #0001}
-.k b{display:block;font-size:24px;color:var(--g2)}.mut{color:var(--mu);font-size:13px}
-button{background:var(--g);color:#fff;border:0;border-radius:12px;padding:11px 18px;font:inherit;font-weight:700;cursor:pointer;transition:.2s}
-button:hover{background:var(--g2)}button.s{background:var(--gl);color:var(--g2)}button.d{background:#fee2e2;color:#b91c1c}
-input,select,textarea{width:100%;padding:11px;border:1px solid #d6e0d9;border-radius:12px;font:inherit;background:#fff}
-label{font-size:13px;font-weight:600;color:var(--mu);display:block}
-.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.meal{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 0;border-bottom:1px solid #eef2ee}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 0}.tabs button{white-space:nowrap}
-.bar{height:10px;border-radius:9px;background:#e5ebe6;overflow:hidden}.bar i{display:block;height:100%;background:var(--g);transition:width 1s}
-.imc{position:relative;height:10px;border-radius:9px;background:linear-gradient(90deg,#60a5fa 14%,#22c55e 14% 40%,#facc15 40% 60%,#ef4444 60%);margin:12px 0}
-.imc i{position:absolute;top:-4px;width:6px;height:18px;background:#14231a;border-radius:3px}
-.toast{position:fixed;top:16px;right:16px;background:var(--g2);color:#fff;padding:12px 18px;border-radius:12px;z-index:99;animation:fi .3s}.toast.err{background:#b91c1c}
-.load{display:grid;place-items:center;height:60vh}.load i{width:42px;height:42px;border:4px solid var(--gl);border-top-color:var(--g);border-radius:50%;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
-dialog{border:0;border-radius:var(--r);padding:22px;max-width:480px;width:92%;margin:auto;box-shadow:0 10px 40px #0004}
-.ch{width:100%}.ch .ln{fill:none;stroke:var(--g);stroke-width:3;stroke-dasharray:2000;stroke-dashoffset:2000;animation:dr 2s forwards}@keyframes dr{to{stroke-dashoffset:0}}.ch circle{fill:var(--g2)}.ch text{font-size:11px;fill:var(--mu)}
-.auth{max-width:380px;margin:8vh auto;padding:0 16px}
-.disc{font-size:12px;color:var(--mu);margin-top:30px}
-.wk{background:var(--gl);padding:12px 16px;border-radius:14px;margin:10px 0;color:var(--g2);font-weight:600}
-h1{font-size:26px}h3{margin-bottom:6px}
-@media(max-width:800px){.shell{display:block}nav{position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;flex-direction:row;overflow-x:auto;padding:6px;z-index:50;border:0;box-shadow:0 -2px 12px #0002}nav a{flex-direction:column;align-items:center;font-size:10px;padding:6px 10px;gap:0}nav .logo{display:none}main{padding:16px 14px 90px}}
-</style></head>
-<body><div id="app"></div><dialog id="dlg"></dialog>
+:root{--bg:#eef4ec;--ink:#16301f;--g1:#1f6b43;--g2:#2f8f5b;--g3:#d3e7d7;--sun:#f2b705;--card:#fff;--mut:#5b7263;--err:#b3261e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Nunito Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;margin:0 0 .5rem;line-height:1.15}
+[hidden]{display:none!important}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:14px;padding:18px;margin-bottom:14px;border:1px solid var(--g3)}
+input,select,button{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid #b9d3bf;width:100%;margin:4px 0 10px;background:#fff;color:var(--ink)}
+button{cursor:pointer;background:var(--g1);color:#fff;border:0;font-weight:700}
+button.sec{background:var(--g3);color:var(--g1)}
+button.red{background:var(--err)}
+button.sm{width:auto;padding:6px 12px;margin:0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
+label{font-weight:600;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--g3);border-radius:12px;padding:12px}
+.stat b{display:block;font:800 1.6rem 'Bricolage Grotesque',sans-serif;color:var(--g1)}
+header{background:var(--g1);color:#fff}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px}
+header h1{font-size:1.6rem;margin:0}
+header h1 span{color:var(--sun)}
+header button{background:transparent;border:1px solid #fff8;width:auto;margin:0;padding:6px 12px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+nav button,.days button{width:auto;margin:0;background:var(--g3);color:var(--g1);padding:8px 14px}
+nav button.on,.days button.on{background:var(--g1);color:#fff}
+.days{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}
+.meal{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--g3)}
+.meal:last-child{border:0}
+.meal small{color:var(--mut);display:block}
+.tag{display:inline-block;background:var(--sun);color:#3a2d00;border-radius:8px;padding:1px 8px;font-size:.8rem;font-weight:700}
+.msg{color:var(--err);min-height:1.4em;font-weight:600}
+.ok{color:var(--g1)}
+table{width:100%;border-collapse:collapse}
+td,th{text-align:left;padding:8px 4px;border-bottom:1px solid var(--g3);font-size:.92rem}
+#auth{max-width:420px;margin:7vh auto}
+@media(max-width:520px){.meal{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div id="auth" class="wrap">
+  <div class="card">
+    <h1>Diet's</h1>
+    <p>Sua dieta com a comida do dia a dia do brasileiro.</p>
+    <label for="em">E-mail</label><input id="em" type="email" autocomplete="email">
+    <label for="sn">Senha</label><input id="sn" type="password" autocomplete="current-password">
+    <button onclick="entrar()">Entrar</button>
+    <button class="sec" onclick="cadastrar()">Criar conta</button>
+    <button class="sec" onclick="loginGoogle()">Entrar com Google</button>
+    <button class="sec" onclick="recuperar()">Esqueci minha senha</button>
+    <div id="amsg" class="msg" role="alert"></div>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header><div class="wrap"><h1>Diet's<span>.</span></h1><span id="quem"></span><button onclick="sair()">Sair</button></div></header>
+  <div class="wrap">
+    <nav id="nav">
+      <button data-t="dieta" class="on">Dieta</button>
+      <button data-t="prog">Progresso</button>
+      <button data-t="perfil">Perfil</button>
+      <button data-t="admin" id="tabadm" hidden>Admin</button>
+    </nav>
+
+    <section id="t-dieta">
+      <div class="card"><div class="grid" id="stats"></div></div>
+      <div class="card"><h2>Dieta da semana</h2><div class="days" id="days"></div><div id="meals"></div></div>
+    </section>
+
+    <section id="t-prog" hidden>
+      <div class="card"><h2>Registrar peso</h2>
+        <label for="pnovo">Peso de hoje (kg)</label><input id="pnovo" type="number" step="0.1">
+        <button onclick="addPeso()">Salvar peso</button><div id="pmsg" class="msg"></div></div>
+      <div class="card"><h2>Evolução</h2><div id="chart"></div><div id="plist"></div></div>
+    </section>
+
+    <section id="t-perfil" hidden>
+      <div class="card"><h2>Meu perfil</h2><div id="pfmsg" class="msg"></div>
+        <label for="f-nome">Nome</label><input id="f-nome">
+        <div class="grid">
+          <div><label for="f-sexo">Sexo</label><select id="f-sexo"><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+          <div><label for="f-idade">Idade</label><input id="f-idade" type="number"></div>
+          <div><label for="f-altura">Altura (cm)</label><input id="f-altura" type="number"></div>
+          <div><label for="f-peso">Peso (kg)</label><input id="f-peso" type="number" step="0.1"></div>
+        </div>
+        <label for="f-ativ">Atividade física</label>
+        <select id="f-ativ"><option value="1.2">Sedentário</option><option value="1.375">Leve (1-3x por semana)</option><option value="1.55">Moderada (3-5x por semana)</option><option value="1.725">Intensa (6-7x por semana)</option></select>
+        <label for="f-obj">Objetivo</label>
+        <select id="f-obj"><option value="emagrecer">Emagrecer</option><option value="manter">Manter o peso</option><option value="ganhar">Ganhar massa</option></select>
+        <button onclick="salvarPerfil()">Salvar perfil</button>
+      </div>
+    </section>
+
+    <section id="t-admin" hidden>
+      <div class="card"><h2>Usuários</h2><div id="ulist"></div></div>
+    </section>
+  </div>
+</div>
+
 <script>
-/* ===== CONFIGURAÇÃO DO SUPABASE =====
-   Settings > API no painel do Supabase. Use SOMENTE a chave anon/public.
-   NUNCA coloque a service_role aqui. */
-const SUPABASE_URL = 'https://zmjseszmqfqlqqlzudsn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptanNlc3ptcWZxbHFxbHp1ZHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzOTU1NjksImV4cCI6MjEwNjk3MTU2OX0.WTijFFhtFFXWO6Y3yt8nbUF9RQhGJzwJRdzj39Lx-k4';
-/* ==================================== */
+// ====== CONFIGURE AQUI ======
+const SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
+const SUPABASE_KEY = 'SUA-ANON-KEY';
+const SITE = 'https://henriquegom3s.github.io/Diet-s/';
+// ============================
 
-const $=s=>document.querySelector(s),app=$('#app');
-const COZ={br:'🇧🇷 Brasileira',it:'🇮🇹 Italiana',mx:'🇲🇽 Mexicana',ar:'🇸🇦 Árabe',me:'🇬🇷 Mediterrânea',as:'🇯🇵 Asiática',sa:'🥗 Saudável'};
-const TIPOS={cafe:'☀️ Café da manhã',lanche:'🍎 Lanche',almoco:'🍽️ Almoço',jantar:'🌙 Jantar',livre:'🎉 Refeição livre'};
-const DIAS=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
-const ATV={sedentario:['Sedentário',1.2],leve:['Levemente ativo',1.375],moderado:['Moderadamente ativo',1.55],muito:['Muito ativo',1.725],extremo:['Extremamente ativo',1.9]};
-const OBJ={emagrecer:'Emagrecer',manter:'Manter peso',ganhar:'Ganhar massa muscular',reeducacao:'Reeducação alimentar'};
-const SLW=[['cafe',.22],['lanche',.1],['almoco',.33],['lanche',.12],['jantar',.23]];
-const SLE=[['cafe',.22],['almoco',.33],['lanche',.13],['livre',.32]];
-const LOGO='<svg width="34" height="34" viewBox="0 0 40 40"><rect width="40" height="40" rx="12" fill="#16a34a"/><path d="M12 28c0-9 6-15 17-16 0 10-5 17-14 17-1 0-2 0-3-1z" fill="#fff"/><path d="M12 28c4-6 8-9 13-12" stroke="#16a34a" stroke-width="2" fill="none"/></svg>';
-if(!window.supabase){app.innerHTML='<div class="auth"><div class="card"><h3>Biblioteca não carregou</h3><p>Verifique sua conexão com a internet e recarregue a página.</p></div></div>';throw new Error('supabase-js não carregou')}
-const sb=supabase.createClient(SUPABASE_URL.startsWith('http')?SUPABASE_URL:'https://placeholder.supabase.co',SUPABASE_ANON_KEY||'x');
-let S={};
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let U = null, P = null, day = 0;
 
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const toast=(m,e)=>{const t=document.createElement('div');t.className='toast'+(e?' err':'');t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),3200)};
-const loading=()=>app.innerHTML='<div class="load"><i></i></div>';
-const modal=h=>{$('#dlg').innerHTML=h+'<p style="margin-top:14px"><button class="s" onclick="this.closest(\'dialog\').close()">Fechar</button></p>';$('#dlg').showModal()};
-const disc=()=>'<p class="disc">As informações apresentadas pelo Diet\'s são estimativas e têm finalidade informativa. O planejamento alimentar não substitui avaliação ou acompanhamento de nutricionista ou outro profissional de saúde.</p>';
-const hoje=()=>(new Date().getDay()+6)%7,sum=a=>a.reduce((t,x)=>t+x.calorias,0),fmtD=s=>s.split('-').reverse().join('/');
-const dayMeals=d=>S.plan.filter(x=>x.dia_semana==d).sort((a,b)=>a.ordem-b.ordem);
-const rec=m=>S.recipes.find(r=>r.id==m.recipe_id);
-const fit=(r,tg)=>{const f=Math.min(1.5,Math.max(.75,Math.round(tg/r.calorias*4)/4));return{f,cal:Math.round(r.calorias*f)}};
+/* ---------- Receitas (culinária brasileira) [nome, kcal da porção base, descrição] ---------- */
+const R = {
+cafe: [
+ ['Pão com ovo mexido e café com leite',420,'1 pão francês, 2 ovos mexidos, 1 xícara de café com leite'],
+ ['Pão com queijo minas e mamão',380,'1 pão francês, 2 fatias de queijo minas, 1 fatia de mamão'],
+ ['Tapioca com queijo e café',350,'1 tapioca média, 2 fatias de queijo, café sem açúcar'],
+ ['Cuscuz com ovo e leite',410,'1 fatia de cuscuz, 2 ovos, 1 copo de leite'],
+ ['Iogurte com banana e aveia',330,'1 pote de iogurte natural, 1 banana, 2 col. de sopa de aveia'],
+ ['Pão integral com requeijão e laranja',390,'2 fatias de pão integral, 1 col. de requeijão, 1 laranja'],
+ ['Mingau de aveia com banana',340,'3 col. de sopa de aveia, 1 copo de leite, 1 banana']],
+lanche: [
+ ['Banana com aveia',150,'1 banana e 1 col. de sopa de aveia'],
+ ['Iogurte natural com mel',140,'1 pote de iogurte e 1 col. de chá de mel'],
+ ['Maçã e castanhas',160,'1 maçã e 3 castanhas-do-pará'],
+ ['Pão de queijo e café',200,'2 pães de queijo pequenos e café sem açúcar'],
+ ['Mamão com granola',160,'1 fatia de mamão e 2 col. de sopa de granola'],
+ ['Queijo minas com goiaba',150,'2 fatias de queijo minas e 1 goiaba'],
+ ['Vitamina de banana',220,'1 copo de leite batido com 1 banana'],
+ ['Laranja e biscoito de água e sal',140,'1 laranja e 4 biscoitos']],
+almoco: [
+ ['Arroz, feijão, bife acebolado e salada',650,'4 col. de sopa de arroz, 1 concha de feijão, 1 bife (120 g) com cebola, salada de alface e tomate'],
+ ['Arroz, feijão, frango grelhado e legumes',600,'4 col. de arroz, 1 concha de feijão, 1 filé de frango (120 g), cenoura e chuchu'],
+ ['Arroz, feijão, carne moída e couve',640,'4 col. de arroz, 1 concha de feijão, 4 col. de carne moída, couve refogada'],
+ ['Arroz, feijão, tilápia assada e salada',580,'4 col. de arroz, 1 concha de feijão, 1 filé de tilápia, salada de tomate'],
+ ['Arroz, feijão, omelete e salada',560,'4 col. de arroz, 1 concha de feijão, omelete de 2 ovos, salada de alface'],
+ ['Arroz, feijão, picadinho com legumes',650,'4 col. de arroz, 1 concha de feijão, picadinho de carne com batata e cenoura'],
+ ['Arroz, feijão, frango ensopado com batata',620,'4 col. de arroz, 1 concha de feijão, 2 pedaços de frango ensopado com batata'],
+ ['Macarrão ao sugo com carne moída e salada',620,'1 prato de macarrão com molho de tomate e carne moída, salada de alface']],
+jantar: [
+ ['Sopa de legumes com frango desfiado',380,'1 prato fundo de sopa com cenoura, batata, chuchu e frango'],
+ ['Omelete com tomate e arroz',450,'omelete de 2 ovos com tomate, 3 col. de arroz'],
+ ['Arroz, feijão, ovo e salada',480,'3 col. de arroz, 1 concha de feijão, 1 ovo frito ou cozido, salada'],
+ ['Sanduíche natural de frango',420,'2 fatias de pão, frango desfiado, queijo, alface e tomate'],
+ ['Caldo verde',400,'1 prato de caldo de batata com couve e 2 rodelas de linguiça'],
+ ['Tapioca de frango com queijo',430,'1 tapioca com frango desfiado e queijo'],
+ ['Peixe grelhado com purê e salada',470,'1 filé de peixe, 4 col. de purê de batata, salada']],
+ceia: [
+ ['Chá de camomila com torradas',100,'1 xícara de chá e 2 torradas'],
+ ['Leite morno',120,'1 copo de leite morno'],
+ ['Iogurte natural',100,'1 pote pequeno'],
+ ['Mamão',90,'1 fatia média']]
+};
+const DIAS = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+const N6 = ['Café da manhã','Lanche da manhã','Almoço','Lanche da tarde','Jantar','Ceia'];
+const S6 = ['cafe','lanche','almoco','lanche','jantar','ceia'], P6 = [.25,.10,.30,.10,.20,.05];
+const N5 = N6.slice(0,5), S5 = S6.slice(0,5), P5 = [.25,.10,.33,.10,.22];
 
-/* ---- Cálculos (Mifflin-St Jeor) ---- */
+/* ---------- Cálculos ---------- */
 function calc(p){
-  const tmb=Math.round(10*p.peso+6.25*p.altura-5*p.idade+(p.sexo=='M'?5:-161));
-  const tdee=Math.round(tmb*ATV[p.atividade][1]);
-  const fat={emagrecer:.8,manter:1,ganhar:1.1,reeducacao:.95}[p.objetivo];
-  const meta=Math.max(Math.round(tdee*fat/10)*10,p.sexo=='M'?1500:1200);
-  return{tmb,tdee,meta,imc:p.peso/((p.altura/100)**2)};
+  const tmb = 10*p.peso + 6.25*p.altura - 5*p.idade + (p.sexo==='M'?5:-161);
+  const tdee = tmb*p.atividade;
+  let meta = p.objetivo==='emagrecer' ? tdee-500 : p.objetivo==='ganhar' ? tdee+300 : tdee;
+  meta = Math.max(meta, p.sexo==='M'?1500:1200);
+  const imc = p.peso/Math.pow(p.altura/100,2);
+  return {tmb:Math.round(tmb), tdee:Math.round(tdee), meta:Math.round(meta), imc:imc.toFixed(1)};
+}
+const seed = () => [...U.id].reduce((a,c)=>a+c.charCodeAt(0),0);
+const swapKey = () => 'diets_swaps_'+U.id;
+const getSwaps = () => { try { return JSON.parse(localStorage.getItem(swapKey())||'{}'); } catch(e){ return {}; } };
+function trocar(d,i){ const s=getSwaps(); s[d+'-'+i]=(s[d+'-'+i]||0)+1; try{localStorage.setItem(swapKey(),JSON.stringify(s));}catch(e){} renderMeals(); }
+
+/* ---------- Telas ---------- */
+function aba(t){
+  ['dieta','prog','perfil','admin'].forEach(x=>$('t-'+x).hidden = x!==t);
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
+  if(t==='prog') carregarPesos();
+  if(t==='admin') listarUsuarios();
+}
+$('nav').onclick = e => { if(e.target.dataset.t) aba(e.target.dataset.t); };
+
+function perfilCompleto(){ return P && P.peso && P.altura && P.idade && P.sexo; }
+
+function renderStats(){
+  const c = calc(P);
+  $('stats').innerHTML = [['Meta diária',c.meta+' kcal'],['Gasto total (TDEE)',c.tdee+' kcal'],['Metabolismo basal',c.tmb+' kcal'],['IMC',c.imc]]
+    .map(x=>`<div class="stat">${x[0]}<b>${x[1]}</b></div>`).join('');
 }
 
-/* ---- Perfil / cadastro ---- */
-const opt=(o,c)=>Object.entries(o).map(([k,v])=>`<option value="${k}" ${k==c?'selected':''}>${Array.isArray(v)?v[0]:v}</option>`).join('');
-function pForm(p={}){return`<div class="card f" style="margin-top:14px">
-<div><label>Nome completo</label><input id="nome" value="${esc(p.nome)}"></div>
-<div><label>Sexo</label><select id="sexo"><option value="M" ${p.sexo=='M'?'selected':''}>Masculino</option><option value="F" ${p.sexo=='F'?'selected':''}>Feminino</option></select></div>
-<div><label>Idade</label><input id="idade" type="number" value="${p.idade??''}"></div>
-<div><label>Altura (cm)</label><input id="altura" type="number" value="${p.altura??''}"></div>
-<div><label>Peso atual (kg)</label><input id="peso" type="number" step="0.1" value="${p.peso??''}"></div>
-<div><label>Objetivo</label><select id="objetivo">${opt(OBJ,p.objetivo)}</select></div>
-<div><label>Nível de atividade</label><select id="atividade">${opt(ATV,p.atividade)}</select></div>
-<div><label>Peso desejado (opcional)</label><input id="pd" type="number" step="0.1" value="${p.peso_desejado??''}"></div>
-<div><label>Restrições alimentares</label><input id="restricoes" placeholder="ex: ovo, queijo" value="${esc(p.restricoes)}"></div>
-<div><label>Alimentos que não gosta</label><input id="nao_gosta" value="${esc(p.nao_gosta)}"></div>
-<div><label>Alergias</label><input id="alergias" value="${esc(p.alergias)}"></div>
-<div><label>Preferências</label><input id="preferencias" value="${esc(p.preferencias)}"></div></div>`}
-function onboarding(){app.innerHTML=`<div class="auth" style="max-width:760px"><div class="logo">${LOGO}Diet's</div><h2>Vamos começar</h2><p class="mut">Conte um pouco sobre você para montarmos seu plano.</p>${pForm()}<p style="margin-top:14px;display:flex;gap:8px"><button onclick="saveProfile(1)">Criar meu plano</button><button class="s" onclick="boot()">Voltar</button></p>${disc()}</div>`}
-async function saveProfile(first){
-  const g=i=>$('#'+i).value.trim();
-  const p={id:S.user.id,nome:g('nome'),sexo:g('sexo'),idade:+g('idade'),altura:+g('altura'),peso:+g('peso'),objetivo:g('objetivo'),atividade:g('atividade'),peso_desejado:g('pd')?+g('pd'):null,restricoes:g('restricoes'),nao_gosta:g('nao_gosta'),alergias:g('alergias'),preferencias:g('preferencias'),updated_at:new Date().toISOString()};
-  if(!p.nome||!(p.idade>0)||!(p.altura>0)||!(p.peso>0))return toast('Preencha nome, idade, altura e peso.',1);
-  const old=S.profile,mudou=!old||old.peso!=p.peso;
-  const{error}=await sb.from('profiles').upsert(p);if(error)return toast(error.message,1);
-  S.profile={...(old||{}),...p};try{localStorage.setItem('dietsPid',S.user.id)}catch(e){}
-  if(mudou)await sb.from('weight_history').insert({user_id:S.user.id,peso:p.peso,data:new Date().toISOString().slice(0,10)});
-  loading();await loadAll();await gen();shell();toast('Perfil atualizado com sucesso.');
+function renderMeals(){
+  const c = calc(P), cinco = c.meta < 1800;
+  const nomes = cinco?N5:N6, srcs = cinco?S5:S6, pct = cinco?P5:P6, sw = getSwaps();
+  $('days').innerHTML = DIAS.map((d,i)=>`<button class="${i===day?'on':''}" onclick="day=${i};renderMeals()">${d}</button>`).join('');
+  let html = `<p><span class="tag">${nomes.length} refeições por dia</span></p>`;
+  nomes.forEach((nome,i)=>{
+    if(day===5 && nome==='Jantar'){
+      html += `<div class="meal"><div><b>${nome}</b> <span class="tag">Refeição livre</span><small>Coma o que quiser, sem exagerar: churrasco, pizza ou o que preferir.</small></div></div>`;
+      return;
+    }
+    const lista = R[srcs[i]];
+    const r = lista[(seed()+day*3+i*2+(sw[day+'-'+i]||0)) % lista.length];
+    const alvo = c.meta*pct[i];
+    const m = Math.min(2.5, Math.max(.5, Math.round(alvo/r[1]*4)/4));
+    html += `<div class="meal"><div><b>${nome}</b><br>${esc(r[0])}<small>${esc(r[2])} · porção ×${m.toLocaleString('pt-BR')}</small></div>
+      <div style="text-align:right"><b>${Math.round(r[1]*m)} kcal</b><br><button class="sec sm" onclick="trocar(${day},${i})">Trocar</button></div></div>`;
+  });
+  $('meals').innerHTML = html;
 }
 
-/* ---- Dados ---- */
-async function loadAll(){
-  const q=t=>sb.from(t).select('*'),u=S.user.id;
-  const[r,m,w,s]=await Promise.all([q('recipes').order('nome'),q('meal_plans').eq('user_id',u),q('weight_history').eq('user_id',u).order('data'),q('shopping_list').eq('user_id',u).order('grupo')]);
-  [r,m,w,s].forEach(x=>x.error&&toast(x.error.message,1));
-  S.recipes=r.data||[];S.plan=m.data||[];S.weights=w.data||[];S.shop=s.data||[];
-}
-async function boot(){
-  loading();let id=null;try{id=localStorage.getItem('dietsPid')}catch(e){}
-  if(id){const{data:p}=await sb.from('profiles').select('*').eq('id',id).maybeSingle();if(p)return abrirP(p)}
-  telaPessoas();
-}
-async function abrirP(p){S.user={id:p.id};S.profile=p;try{localStorage.setItem('dietsPid',p.id)}catch(e){}loading();await loadAll();if(!S.plan.length&&S.recipes.length)await gen();S.page='home';shell()}
-async function abrir(id){loading();const{data:p,error}=await sb.from('profiles').select('*').eq('id',id).maybeSingle();if(error||!p){toast('Perfil não encontrado.',1);return telaPessoas()}abrirP(p)}
-function telaPessoas(){app.innerHTML=`<div class="auth" style="max-width:760px"><div class="logo">${LOGO}Diet's</div><h2>Quem está usando?</h2><p class="mut">Os perfis são abertos: escolha um para ver a dieta ou crie o seu.</p><div id="pl"></div>${disc()}</div>`;loadPessoas()}
-async function loadPessoas(){const{data,error}=await sb.from('profiles').select('id,nome,objetivo,peso').order('nome');const el=$('#pl');if(!el)return;if(error)return el.innerHTML=`<p class="mut">${esc(error.message)}</p>`;el.innerHTML=`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">${(data||[]).map(p=>`<div class="card" onclick="abrir('${p.id}')" style="cursor:pointer;${S.user?.id==p.id?'outline:2px solid var(--g)':''}"><b>👤 ${esc(p.nome)}</b><div class="mut">${OBJ[p.objetivo]||''} · ${p.peso} kg</div></div>`).join('')}<div class="card" onclick="novo()" style="cursor:pointer;text-align:center"><b>➕ Novo perfil</b></div></div>`}
-function novo(){S.user={id:crypto.randomUUID?.()||'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c=='x'?r:r&3|8).toString(16)})};S.profile=null;S.plan=[];S.page='home';onboarding()}
-
-/* ---- Geração da dieta ---- */
-async function gen(){
-  const p=S.profile,{meta}=calc(p),R=S.recipes;
-  const bad=[p.restricoes,p.nao_gosta,p.alergias].join(',').toLowerCase().split(/[,;]+/).map(x=>x.trim()).filter(x=>x.length>2);
-  const ok=R.filter(x=>!bad.some(b=>(x.nome+JSON.stringify(x.ingredientes)).toLowerCase().includes(b)));
-  const use={},rows=[];let yp={};
-  for(let d=0;d<7;d++){
-    const sl=d>4?SLE:SLW,tp={};
-    sl.forEach(([t,f],o)=>{
-      const tg=meta*f;
-      if(t=='livre')return rows.push({user_id:S.user.id,dia_semana:d,ordem:o,tipo_refeicao:t,calorias:Math.round(tg),fator:1});
-      const pool=ok.filter(x=>x.tipo==t),c=pool.length?pool:R.filter(x=>x.tipo==t);
-      if(!c.length)return;
-      let best,bs=1e9;
-      c.forEach(x=>{const z=fit(x,tg),s=Math.abs(z.cal-tg)+Math.abs(z.f-1)*30+(use[x.id]||0)*80+(yp[t]==x.proteina?50:0)+(d>4&&x.cozinha!='br'&&x.cozinha!='sa'?-40:0)+Math.random()*20;if(s<bs){bs=s;best=[x,z]}});
-      use[best[0].id]=(use[best[0].id]||0)+1;tp[t]=best[0].proteina;
-      rows.push({user_id:S.user.id,dia_semana:d,ordem:o,tipo_refeicao:t,recipe_id:best[0].id,calorias:best[1].cal,fator:best[1].f});
-    });
-    yp=tp;
-  }
-  await sb.from('meal_plans').delete().eq('user_id',S.user.id);
-  const{error}=await sb.from('meal_plans').insert(rows);if(error)toast(error.message,1);
-  const{data}=await sb.from('meal_plans').select('*').eq('user_id',S.user.id);S.plan=data||[];
-}
-async function regen(){loading();await gen();render_();toast('Nova dieta gerada.')}
-const render_=()=>{shell()};
-
-/* ---- Interface ---- */
-function shell(){
-  const it=[['home','🏠','Visão geral'],['dieta','🍽️','Dieta'],['receitas','📖','Receitas'],['compras','🛒','Compras'],['progresso','📈','Progresso'],['perfil','👤','Perfil']];
-  it.push(['pessoas','👥','Pessoas'],['admin','🛠️','Admin']);
-  app.innerHTML=`<div class="shell"><nav><div class="logo">${LOGO}Diet's</div>${it.map(([k,i,n])=>`<a id="n-${k}" onclick="go('${k}')">${i}<span>${n}</span></a>`).join('')}</nav><main id="main"></main></div>`;
-  go(S.page||'home');
-}
-const go=p=>{S.page=p;render();scrollTo(0,0)};
-function render(){const m=$('#main');m.style.animation='none';m.offsetHeight;m.style.animation='';m.innerHTML=P[S.page]();document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.id=='n-'+S.page))}
-
-function mealRow(m,sw){
-  const r=rec(m);
-  return`<div class="meal"><div><div class="mut">${TIPOS[m.tipo_refeicao]}</div><b>${r?r.emoji+' '+esc(r.nome):'Coma algo diferente, com moderação'}</b>${m.fator!=1?`<div class="mut">porção ×${m.fator}</div>`:''}</div><div style="text-align:right"><b>${m.tipo_refeicao=='livre'?'até ':''}${m.calorias} kcal</b><br>${sw?(r?`<button class="s" onclick="trocar(${m.id})">Trocar refeição</button>`:''):`<label style="display:flex;gap:6px;justify-content:flex-end"><input type="checkbox" style="width:auto" ${m.consumida?'checked':''} onchange="cons(${m.id},this.checked)">consumida</label>`}</div></div>`;
-}
-async function cons(id,v){await sb.from('meal_plans').update({consumida:v}).eq('id',id);S.plan.find(x=>x.id==id).consumida=v;render()}
-
-const P={
-home(){
-  const p=S.profile,c=calc(p),ms=dayMeals(hoje()),tot=sum(ms),eat=sum(ms.filter(x=>x.consumida));
-  const ini=S.weights[0]?.peso??p.peso,al=p.peso_desejado,pr=al&&ini!=al?Math.max(0,Math.min(100,Math.round((ini-p.peso)/(ini-al)*100))):0;
-  return`<h1>Olá, ${esc(p.nome.split(' ')[0])} 👋</h1><p class="mut">Seu planejamento de hoje</p>
-<div class="grid">${[['Peso atual',p.peso+' kg'],['Meta de peso',al?al+' kg':'—'],['TMB',c.tmb+' kcal'],['Gasto diário',c.tdee+' kcal'],['Meta calórica',c.meta+' kcal'],['Objetivo',OBJ[p.objetivo]]].map(([a,b])=>`<div class="card k"><span class="mut">${a}</span><b>${b}</b></div>`).join('')}</div>
-<div class="card"><b>Progresso rumo ao peso desejado: ${pr}%</b><div class="bar" style="margin-top:8px"><i style="width:${pr}%"></i></div></div>
-<div class="card" style="margin-top:14px"><h3>Sua dieta hoje</h3>${ms.map(m=>mealRow(m)).join('')||'<p class="mut">Nenhuma refeição planejada.</p>'}<p style="margin-top:12px"><b>Total: ${tot} / ${c.meta} kcal</b><br><span class="mut">Consumidas: ${eat} kcal · Restantes: ${Math.max(0,c.meta-eat)} kcal</span></p></div>`+disc();
-},
-dieta(){
-  const d=S.dia??hoje(),ms=dayMeals(d),lv=ms.find(m=>m.tipo_refeicao=='livre');
-  return`<h1>Minha dieta</h1><div class="tabs">${DIAS.map((n,i)=>`<button class="${i==d?'':'s'}" onclick="S.dia=${i};render()">${n.slice(0,3)}</button>`).join('')}</div>
-<div class="card"><h3>${DIAS[d]}</h3>${lv?`<div class="wk">🎉 Fim de semana · Refeição livre disponível: até ${lv.calorias} kcal</div>`:''}${ms.map(m=>mealRow(m,1)).join('')}<p style="margin-top:12px"><b>Total do dia: ${sum(ms)} kcal</b></p></div>
-<p style="margin-top:14px"><button class="s" onclick="regen()">🔄 Gerar nova dieta</button></p>`+disc();
-},
-receitas(){
-  setTimeout(listR);
-  const sel=(id,o)=>`<select id="${id}" onchange="listR()"><option value="">Todos</option>${o}</select>`;
-  return`<h1>Receitas</h1><div class="card f" style="margin-top:14px">
-<div><label>Pesquisar receitas</label><input id="q" oninput="listR()" placeholder="Nome..."></div>
-<div><label>País</label>${sel('fc',Object.entries(COZ).map(([k,v])=>`<option value="${k}">${v}</option>`).join(''))}</div>
-<div><label>Tipo de refeição</label>${sel('ft',['cafe','lanche','almoco','jantar'].map(k=>`<option value="${k}">${TIPOS[k]}</option>`).join(''))}</div>
-<div><label>Calorias até</label><input id="fk" type="number" oninput="listR()"></div>
-<div><label>Proteína mín. (g)</label><input id="fp" type="number" oninput="listR()"></div>
-<div><label>Tempo até (min)</label><input id="fm" type="number" oninput="listR()"></div></div>
-<div class="grid" id="rl" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))"></div>`+disc();
-},
-compras(){
-  const g={};S.shop.forEach(i=>(g[i.grupo]??=[]).push(i));
-  return`<h1>Lista de compras</h1><p style="margin-top:12px"><button onclick="mkShop()">🛒 Gerar da dieta da semana</button></p>${Object.entries(g).map(([k,v])=>`<div class="card" style="margin-top:12px"><h3>${esc(k)}</h3>${v.map(i=>`<label style="display:flex;gap:10px;padding:8px 0;color:var(--tx);${i.comprado?'text-decoration:line-through;opacity:.5':''}"><input type="checkbox" style="width:auto" ${i.comprado?'checked':''} onchange="buy(${i.id},this.checked)">${esc(i.quantidade)} ${esc(i.item)}</label>`).join('')}</div>`).join('')||'<p class="mut" style="margin-top:14px">Sua lista está vazia. Gere a partir da dieta.</p>'}`+disc();
-},
-progresso(){
-  const w=S.weights,p=S.profile,ini=w[0]?.peso??p.peso,al=p.peso_desejado,dif=+(p.peso-ini).toFixed(1);
-  return`<h1>Meu progresso</h1><div class="grid">${[['Peso inicial',ini+' kg'],['Peso atual',p.peso+' kg'],['Meta',al?al+' kg':'—'],['Evolução',(dif>0?'+':'')+dif+' kg'],['Falta',al?Math.abs(p.peso-al).toFixed(1)+' kg':'—']].map(([a,b])=>`<div class="card k"><span class="mut">${a}</span><b>${b}</b></div>`).join('')}</div>
-<div class="card">${chart(w)}</div>
-<div class="card f" style="margin-top:14px"><div><label>Data</label><input id="wd" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div><label>Peso (kg)</label><input id="wp" type="number" step="0.1"></div><div style="align-self:end"><button onclick="addW()">Registrar peso</button></div></div>
-<div class="card" style="margin-top:14px">${[...w].reverse().map(x=>`<div class="meal"><span>${fmtD(x.data)}</span><b>${x.peso} kg</b></div>`).join('')}</div>`+disc();
-},
-perfil(){
-  const p=S.profile,c=calc(p),i=c.imc,cl=i<18.5?'Abaixo do peso':i<25?'Peso normal':i<30?'Sobrepeso':'Obesidade',pos=Math.max(0,Math.min(100,(i-15)/25*100));
-  return`<h1>Meu perfil</h1><div class="grid">${[['Sua TMB',c.tmb+' kcal/dia'],['Gasto energético diário',c.tdee+' kcal'],['Meta calórica',c.meta+' kcal']].map(([a,b])=>`<div class="card k"><span class="mut">${a}</span><b>${b}</b></div>`).join('')}</div>
-<p class="mut">Sua TMB representa a quantidade aproximada de energia que seu corpo utiliza em repouso. Sua meta diária considera também seu nível de atividade e seu objetivo.</p>
-<div class="card" style="margin-top:14px"><b>IMC ${i.toFixed(1)} — ${cl}</b><div class="imc"><i style="left:${pos}%"></i></div><p class="mut">O IMC é apenas um indicador geral e não substitui avaliação profissional.</p></div>
-${pForm(p)}<p style="margin-top:14px;display:flex;gap:8px"><button onclick="saveProfile()">Salvar alterações</button><button class="s" onclick="go('pessoas')">Trocar de perfil</button></p>`+disc();
-},
-pessoas(){setTimeout(loadPessoas);return`<h1>Pessoas</h1><p class="mut">Todos os perfis são abertos: toque em um para ver a dieta.</p><div id="pl" style="margin-top:14px"></div>`},
-admin(){
-  setTimeout(loadU);
-  return`<h1>Painel administrativo</h1><div class="card" style="margin-top:14px"><h3>Receita</h3><div class="f"><input id="ai" type="hidden">
-<div><label>Nome</label><input id="an"></div><div><label>Cozinha</label><select id="ac">${Object.entries(COZ).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
-<div><label>Tipo</label><select id="at">${['cafe','lanche','almoco','jantar'].map(k=>`<option>${k}</option>`).join('')}</select></div><div><label>Proteína base</label><input id="apb"></div>
-<div><label>Kcal</label><input id="ak" type="number"></div><div><label>Prot (g)</label><input id="ap" type="number"></div><div><label>Carb (g)</label><input id="acb" type="number"></div><div><label>Gord (g)</label><input id="ag" type="number"></div>
-<div><label>Porções</label><input id="apo" type="number" value="1"></div><div><label>Tempo (min)</label><input id="atm" type="number"></div><div><label>Emoji</label><input id="ae" value="🍽️"></div></div>
-<label style="margin-top:10px">Ingredientes (nome,qtd,un,grupo — um por linha)</label><textarea id="aig" rows="4"></textarea>
-<label style="margin-top:10px">Modo de preparo</label><textarea id="amp" rows="3"></textarea><p style="margin-top:12px"><button onclick="saveRec()">Salvar receita</button></p></div>
-<div class="card" style="margin-top:14px"><h3>Receitas</h3>${S.recipes.map(r=>`<div class="meal"><span>${r.emoji} ${esc(r.nome)}</span><span><button class="s" onclick="editRec(${r.id})">Editar</button> <button class="d" onclick="delRec(${r.id})">Excluir</button></span></div>`).join('')}</div>
-<div class="card" style="margin-top:14px"><h3>Usuários</h3><div id="au"></div></div>`;
-}};
-
-/* ---- Receitas ---- */
-function listR(){
-  const v=i=>$('#'+i)?.value||'',q=v('q').toLowerCase(),c=v('fc'),t=v('ft'),k=+v('fk'),pr=+v('fp'),tm=+v('fm');
-  const l=S.recipes.filter(r=>(!q||r.nome.toLowerCase().includes(q))&&(!c||r.cozinha==c)&&(!t||r.tipo==t)&&(!k||r.calorias<=k)&&(!pr||r.proteinas>=pr)&&(!tm||r.tempo_preparo<=tm));
-  const el=$('#rl');if(!el)return;
-  el.innerHTML=l.map(r=>`<div class="card" onclick="verR(${r.id})" style="cursor:pointer"><div style="font-size:40px">${r.emoji||'🍽️'}</div><b>${esc(r.nome)}</b><div class="mut">${COZ[r.cozinha]||''}</div><p><b>${r.calorias} kcal</b> · P ${r.proteinas}g · C ${r.carboidratos}g · G ${r.gorduras}g</p><div class="mut">⏱ ${r.tempo_preparo} min · ${r.porcoes} porç.</div></div>`).join('')||'<p class="mut">Nenhuma receita encontrada.</p>';
-}
-function verR(id){const r=S.recipes.find(x=>x.id==id);modal(`<h3>${r.emoji} ${esc(r.nome)}</h3><p class="mut">${COZ[r.cozinha]||''} · ${r.calorias} kcal · ${r.tempo_preparo} min · ${r.porcoes} porção(ões)</p><p>Proteínas ${r.proteinas} g · Carboidratos ${r.carboidratos} g · Gorduras ${r.gorduras} g</p><h3 style="margin-top:10px">Ingredientes</h3><ul style="padding-left:20px">${r.ingredientes.map(([n,q,u])=>`<li>${q} ${esc(u)} ${esc(n)}</li>`).join('')}</ul><h3 style="margin-top:10px">Modo de preparo</h3><p>${esc(r.modo_preparo)}</p>`)}
-
-/* ---- Troca de refeição ---- */
-function trocar(id){
-  const m=S.plan.find(x=>x.id==id),cur=rec(m),tg=m.calorias;
-  const alt=S.recipes.filter(r=>r.tipo==m.tipo_refeicao&&r.id!=m.recipe_id).map(r=>({r,z:fit(r,tg)})).sort((a,b)=>Math.abs(a.z.cal-tg)-Math.abs(b.z.cal-tg)).slice(0,4);
-  modal(`<h3>Trocar refeição</h3><p class="mut">Atual: ${esc(cur.nome)} — ${m.calorias} kcal</p>${alt.map(a=>`<div class="meal"><div>${a.r.emoji} <b>${esc(a.r.nome)}</b><div class="mut">${a.z.cal} kcal</div></div><button onclick="troca(${m.id},${a.r.id},${a.z.f},${a.z.cal})">Escolher</button></div>`).join('')}`);
-}
-async function troca(id,rid,f,cal){
-  const{error}=await sb.from('meal_plans').update({recipe_id:rid,fator:f,calorias:cal,consumida:false}).eq('id',id);if(error)return toast(error.message,1);
-  Object.assign(S.plan.find(x=>x.id==id),{recipe_id:rid,fator:f,calorias:cal,consumida:false});
-  $('#dlg').close();render();toast('Refeição substituída.');
+function preencherForm(){
+  $('f-nome').value = P.nome||''; $('f-sexo').value = P.sexo||'F'; $('f-idade').value = P.idade||'';
+  $('f-altura').value = P.altura||''; $('f-peso').value = P.peso||'';
+  $('f-ativ').value = String(P.atividade||1.375); $('f-obj').value = P.objetivo||'manter';
 }
 
-/* ---- Compras ---- */
-async function mkShop(){
-  const a={};
-  S.plan.forEach(m=>{const r=rec(m);if(!r)return;r.ingredientes.forEach(([n,q,u,g])=>{const k=n+'|'+u;a[k]??={n,u,g,q:0};a[k].q+=q*m.fator})});
-  const old=Object.fromEntries(S.shop.map(i=>[i.item,i.comprado]));
-  const rows=Object.values(a).map(x=>{let q=x.q,u=x.u;if(u=='g'&&q>=1000){q/=1000;u='kg'}return{user_id:S.user.id,item:x.n,quantidade:(Math.round(q*10)/10)+' '+u,grupo:x.g,comprado:!!old[x.n]}});
-  await sb.from('shopping_list').delete().eq('user_id',S.user.id);
-  const{error}=await sb.from('shopping_list').insert(rows);if(error)return toast(error.message,1);
-  const{data}=await sb.from('shopping_list').select('*').eq('user_id',S.user.id).order('grupo');S.shop=data||[];render();toast('Lista de compras gerada.');
-}
-async function buy(id,v){await sb.from('shopping_list').update({comprado:v}).eq('id',id);S.shop.find(x=>x.id==id).comprado=v;render()}
-
-/* ---- Progresso ---- */
-function chart(w){
-  if(w.length<2)return'<p class="mut">Registre ao menos 2 pesos para ver o gráfico.</p>';
-  const W=600,H=220,pd=30,ys=w.map(x=>+x.peso),mn=Math.min(...ys)-1,mx=Math.max(...ys)+1;
-  const pts=w.map((x,i)=>[pd+i*(W-2*pd)/(w.length-1),H-pd-(x.peso-mn)/(mx-mn)*(H-2*pd)]);
-  return`<svg viewBox="0 0 ${W} ${H}" class="ch"><polyline class="ln" points="${pts.map(q=>q.join(',')).join(' ')}"/>${pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="4"><title>${fmtD(w[i].data)}: ${w[i].peso} kg</title></circle>`).join('')}<text x="${pd}" y="14">${mx.toFixed(1)} kg</text><text x="${pd}" y="${H-6}">${mn.toFixed(1)} kg</text></svg>`;
-}
-async function addW(){
-  const peso=+$('#wp').value,data=$('#wd').value;if(!(peso>0)||!data)return toast('Informe data e peso.',1);
-  const{error}=await sb.from('weight_history').insert({user_id:S.user.id,peso,data});if(error)return toast(error.message,1);
-  const last=S.weights[S.weights.length-1];
-  if(!last||data>=last.data){await sb.from('profiles').update({peso}).eq('id',S.user.id);S.profile.peso=peso;await loadAll();await gen()}else await loadAll();
-  render();toast('Peso registrado.');
+async function salvarPerfil(){
+  const nv = {nome:$('f-nome').value.trim(), sexo:$('f-sexo').value, idade:+$('f-idade').value, altura:+$('f-altura').value,
+              peso:+$('f-peso').value, atividade:+$('f-ativ').value, objetivo:$('f-obj').value};
+  if(!nv.idade||!nv.altura||!nv.peso){ $('pfmsg').textContent='Preencha idade, altura e peso.'; return; }
+  const {error} = await sb.from('profiles').update(nv).eq('id',U.id);
+  if(error){ $('pfmsg').textContent='Erro ao salvar: '+error.message; return; }
+  if(!P.peso || P.peso!==nv.peso) await sb.from('pesos').insert({user_id:U.id, peso:nv.peso});
+  P = {...P, ...nv}; $('pfmsg').textContent='';
+  $('quem').textContent = P.nome||P.email; renderStats(); renderMeals(); aba('dieta');
 }
 
-/* ---- Admin ---- */
-async function loadU(){const{data}=await sb.from('profiles').select('nome,objetivo,peso,is_admin');const el=$('#au');if(el)el.innerHTML=(data||[]).map(u=>`<div class="meal"><span>${esc(u.nome)}${u.is_admin?' 🛠️':''}</span><span class="mut">${OBJ[u.objetivo]||''} · ${u.peso} kg</span></div>`).join('')}
-async function saveRec(){
-  const g=i=>$('#'+i).value.trim(),id=g('ai');
-  const ing=g('aig').split('\n').map(l=>l.split(',').map(x=>x.trim())).filter(a=>a[0]).map(a=>[a[0],+a[1]||1,a[2]||'un',a[3]||'Outros']);
-  const o={nome:g('an'),cozinha:g('ac'),tipo:g('at'),proteina:g('apb'),calorias:+g('ak'),proteinas:+g('ap'),carboidratos:+g('acb'),gorduras:+g('ag'),porcoes:+g('apo')||1,tempo_preparo:+g('atm')||0,emoji:g('ae')||'🍽️',ingredientes:ing,modo_preparo:g('amp')};
-  if(!o.nome||!(o.calorias>0))return toast('Informe nome e calorias.',1);
-  if(id)o.id=+id;
-  const{error}=await sb.from('recipes').upsert(o);if(error)return toast(error.message,1);
-  await loadAll();render();toast('Receita salva.');
+/* ---------- Progresso ---------- */
+async function addPeso(){
+  const v = +$('pnovo').value;
+  if(!v){ $('pmsg').textContent='Digite o peso em kg.'; return; }
+  const {error} = await sb.from('pesos').insert({user_id:U.id, peso:v});
+  if(error){ $('pmsg').textContent='Erro: '+error.message; return; }
+  await sb.from('profiles').update({peso:v}).eq('id',U.id); P.peso=v;
+  $('pnovo').value=''; $('pmsg').textContent=''; renderStats(); renderMeals(); carregarPesos();
 }
-function editRec(id){
-  const r=S.recipes.find(x=>x.id==id),set=(i,v)=>$('#'+i).value=v??'';
-  set('ai',r.id);set('an',r.nome);set('ac',r.cozinha);set('at',r.tipo);set('apb',r.proteina);set('ak',r.calorias);set('ap',r.proteinas);set('acb',r.carboidratos);set('ag',r.gorduras);set('apo',r.porcoes);set('atm',r.tempo_preparo);set('ae',r.emoji);set('aig',r.ingredientes.map(a=>a.join(',')).join('\n'));set('amp',r.modo_preparo);scrollTo(0,0);
-}
-async function delRec(id){
-  if(!confirm('Excluir esta receita?'))return;
-  const{error}=await sb.from('recipes').delete().eq('id',id);if(error)return toast(error.message,1);
-  await loadAll();render();toast('Receita excluída.');
+async function carregarPesos(){
+  const {data} = await sb.from('pesos').select('peso,data').eq('user_id',U.id).order('data').order('id');
+  const l = data||[];
+  if(l.length<1){ $('chart').innerHTML=''; $('plist').innerHTML='<p>Nenhum peso registrado ainda. Salve o primeiro acima.</p>'; return; }
+  const mn=Math.min(...l.map(x=>x.peso))-1, mx=Math.max(...l.map(x=>x.peso))+1;
+  const pts = l.map((x,i)=>`${l.length>1?10+i*(280/(l.length-1)):150},${110-((x.peso-mn)/(mx-mn))*100}`).join(' ');
+  $('chart').innerHTML = `<svg viewBox="0 0 300 120" width="100%" role="img" aria-label="Gráfico de peso"><polyline fill="none" stroke="#1f6b43" stroke-width="3" points="${pts}"/></svg>`;
+  $('plist').innerHTML = '<table>'+l.slice().reverse().slice(0,10).map(x=>`<tr><td>${new Date(x.data+'T12:00').toLocaleDateString('pt-BR')}</td><td>${x.peso} kg</td></tr>`).join('')+'</table>';
 }
 
-boot();
-</script></body></html>
+/* ---------- Admin ---------- */
+async function listarUsuarios(){
+  const {data,error} = await sb.rpc('admin_listar_usuarios');
+  if(error){ $('ulist').textContent='Erro: '+error.message; return; }
+  const t = document.createElement('table');
+  t.innerHTML = '<tr><th>Nome</th><th>E-mail</th><th></th></tr>';
+  data.forEach(u=>{
+    const tr = document.createElement('tr');
+    [u.nome||'-', u.email||'-'].forEach(v=>{ const td=document.createElement('td'); td.textContent=v; tr.appendChild(td); });
+    const td = document.createElement('td');
+    if(u.id!==U.id){
+      const b = document.createElement('button'); b.className='red sm'; b.textContent='Excluir';
+      b.onclick = async ()=>{
+        if(!confirm('Excluir '+(u.email||u.nome)+'? Isso apaga a conta e todos os dados.')) return;
+        const r = await sb.rpc('admin_excluir_usuario',{uid:u.id});
+        if(r.error) alert('Erro: '+r.error.message); else listarUsuarios();
+      };
+      td.appendChild(b);
+    }
+    tr.appendChild(td); t.appendChild(tr);
+  });
+  $('ulist').innerHTML=''; $('ulist').appendChild(t);
+}
+
+/* ---------- Login ---------- */
+const amsg = (t,ok) => { $('amsg').textContent=t; $('amsg').className='msg'+(ok?' ok':''); };
+async function entrar(){
+  const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('sn').value});
+  if(error) amsg('Não foi possível entrar: '+error.message);
+}
+async function cadastrar(){
+  if($('sn').value.length<6){ amsg('A senha precisa ter ao menos 6 caracteres.'); return; }
+  const {error} = await sb.auth.signUp({email:$('em').value.trim(), password:$('sn').value, options:{emailRedirectTo:SITE}});
+  if(error) amsg('Erro no cadastro: '+error.message); else amsg('Conta criada. Se pedido, confirme o link enviado ao seu e-mail.',true);
+}
+async function recuperar(){
+  const e = $('em').value.trim();
+  if(!e){ amsg('Digite seu e-mail acima.'); return; }
+  const {error} = await sb.auth.resetPasswordForEmail(e,{redirectTo:SITE});
+  if(error) amsg('Erro: '+error.message); else amsg('Enviamos o link para redefinir a senha.',true);
+}
+async function loginGoogle(){
+  const {error} = await sb.auth.signInWithOAuth({provider:'google', options:{redirectTo:SITE}});
+  if(error) amsg('Erro no login com Google: '+error.message);
+}
+async function sair(){ await sb.auth.signOut(); }
+
+async function carregar(session){
+  if(!session){ U=null;P=null; $('app').hidden=true; $('auth').hidden=false; return; }
+  U = session.user;
+  const {data} = await sb.from('profiles').select('*').eq('id',U.id).maybeSingle();
+  P = data || {id:U.id, email:U.email, atividade:1.375, objetivo:'manter'};
+  const adm = await sb.rpc('sou_admin');
+  $('tabadm').hidden = !adm.data;
+  $('auth').hidden = true; $('app').hidden = false;
+  $('quem').textContent = P.nome||P.email||'';
+  preencherForm();
+  if(perfilCompleto()){ renderStats(); renderMeals(); aba('dieta'); }
+  else { aba('perfil'); $('pfmsg').textContent='Complete seu perfil para gerar sua dieta.'; $('pfmsg').className='msg ok'; }
+}
+sb.auth.onAuthStateChange((_e,s)=>setTimeout(()=>carregar(s),0));
+</script>
+</body>
+</html>
