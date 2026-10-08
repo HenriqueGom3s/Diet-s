@@ -47,7 +47,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 /* ==================================== */
 
 const $=s=>document.querySelector(s),app=$('#app');
-const COZ={br:'🇧🇷 Brasileira',it:'🇮🇹 Italiana',mx:'🇲🇽 Mexicana',ar:'🇸🇦 Árabe',me:'🇬🇷 Mediterrânea',as:'🇯🇵 Asiática',sa:'🥗 Saudável'};
+const COZ={br:'🇧🇷 Brasileira',it:'🇮🇹 Italiana (massas)',sa:'🥗 Saladas'};
 const TIPOS={cafe:'☀️ Café da manhã',lanche:'🍎 Lanche',almoco:'🍽️ Almoço',jantar:'🌙 Jantar',livre:'🎉 Refeição livre'};
 const DIAS=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
 const ATV={sedentario:['Sedentário',1.2],leve:['Levemente ativo',1.375],moderado:['Moderadamente ativo',1.55],muito:['Muito ativo',1.725],extremo:['Extremamente ativo',1.9]};
@@ -93,14 +93,14 @@ function pForm(p={}){return`<div class="card f" style="margin-top:14px">
 <div><label>Alimentos que não gosta</label><input id="nao_gosta" value="${esc(p.nao_gosta)}"></div>
 <div><label>Alergias</label><input id="alergias" value="${esc(p.alergias)}"></div>
 <div><label>Preferências</label><input id="preferencias" value="${esc(p.preferencias)}"></div></div>`}
-function onboarding(){app.innerHTML=`<div class="auth" style="max-width:760px"><div class="logo">${LOGO}Diet's</div><h2>Vamos começar</h2><p class="mut">Conte um pouco sobre você para montarmos seu plano.</p>${pForm()}<p style="margin-top:14px;display:flex;gap:8px"><button onclick="saveProfile(1)">Criar meu plano</button><button class="s" onclick="boot()">Voltar</button></p>${disc()}</div>`}
+function onboarding(){app.innerHTML=`<div class="auth" style="max-width:760px"><div class="logo">${LOGO}Diet's</div><h2>Vamos começar</h2><p class="mut">Conte um pouco sobre você para montarmos seu plano.</p>${pForm()}<p style="margin-top:14px;display:flex;gap:8px"><button onclick="saveProfile(1)">Criar meu plano</button><button class="s" onclick="sair()">Sair</button></p>${disc()}</div>`}
 async function saveProfile(first){
   const g=i=>$('#'+i).value.trim();
   const p={id:S.user.id,nome:g('nome'),sexo:g('sexo'),idade:+g('idade'),altura:+g('altura'),peso:+g('peso'),objetivo:g('objetivo'),atividade:g('atividade'),peso_desejado:g('pd')?+g('pd'):null,restricoes:g('restricoes'),nao_gosta:g('nao_gosta'),alergias:g('alergias'),preferencias:g('preferencias'),updated_at:new Date().toISOString()};
   if(!p.nome||!(p.idade>0)||!(p.altura>0)||!(p.peso>0))return toast('Preencha nome, idade, altura e peso.',1);
   const old=S.profile,mudou=!old||old.peso!=p.peso;
   const{error}=await sb.from('profiles').upsert(p);if(error)return toast(error.message,1);
-  S.profile={...(old||{}),...p};try{localStorage.setItem('dietsPid',S.user.id)}catch(e){}
+  S.profile={...(old||{}),...p};
   if(mudou)await sb.from('weight_history').insert({user_id:S.user.id,peso:p.peso,data:new Date().toISOString().slice(0,10)});
   loading();await loadAll();await gen();shell();toast('Perfil atualizado com sucesso.');
 }
@@ -112,16 +112,26 @@ async function loadAll(){
   [r,m,w,s].forEach(x=>x.error&&toast(x.error.message,1));
   S.recipes=r.data||[];S.plan=m.data||[];S.weights=w.data||[];S.shop=s.data||[];
 }
+/* ---- Login (usuário + senha, sem autenticação dupla) ---- */
+const DOM='@diets.app';
+function telaLogin(modo){const c=modo=='up';app.innerHTML=`<div class="auth"><div class="logo">${LOGO}Diet's</div><h2>${c?'Criar conta':'Entrar'}</h2><div class="card f" style="grid-template-columns:1fr;margin-top:14px"><div><label>Usuário</label><input id="lu" autocomplete="username" autocapitalize="none"></div><div><label>Senha</label><input id="lp" type="password" autocomplete="${c?'new-password':'current-password'}" onkeydown="if(event.key=='Enter')${c?'cadastrar()':'entrar()'}"></div><button onclick="${c?'cadastrar()':'entrar()'}">${c?'Criar conta':'Entrar'}</button><button class="s" onclick="telaLogin('${c?'in':'up'}')">${c?'Já tenho conta':'Criar nova conta'}</button></div>${disc()}</div>`}
+function cred(){const u=$('#lu').value.trim().toLowerCase(),p=$('#lp').value;
+  if(!/^[a-z0-9._-]{3,30}$/.test(u)){toast('Usuário: 3 a 30 caracteres (letras, números, . _ -).',1);return null}
+  if(p.length<6){toast('A senha precisa ter ao menos 6 caracteres.',1);return null}
+  return{email:u+DOM,password:p}}
+async function entrar(){const c=cred();if(!c)return;const{error}=await sb.auth.signInWithPassword(c);if(error)return toast('Usuário ou senha incorretos.',1);boot()}
+async function cadastrar(){const c=cred();if(!c)return;const{data,error}=await sb.auth.signUp(c);if(error)return toast(error.message.includes('already')?'Este usuário já existe.':error.message,1);
+  if(!data.session)return toast('Conta criada, mas o Supabase pede confirmação por e-mail: desative "Confirm email" em Authentication > Providers > Email.',1);boot()}
+async function sair(){await sb.auth.signOut();S={};telaLogin('in')}
 async function boot(){
-  loading();let id=null;try{id=localStorage.getItem('dietsPid')}catch(e){}
-  if(id){const{data:p}=await sb.from('profiles').select('*').eq('id',id).maybeSingle();if(p)return abrirP(p)}
-  telaPessoas();
+  loading();const{data:{session}}=await sb.auth.getSession();
+  if(!session)return telaLogin('in');
+  S.user={id:session.user.id};
+  const{data:p}=await sb.from('profiles').select('*').eq('id',S.user.id).maybeSingle();
+  if(p)return abrirP(p);
+  S.profile=null;S.plan=[];S.page='home';onboarding();
 }
-async function abrirP(p){S.user={id:p.id};S.profile=p;try{localStorage.setItem('dietsPid',p.id)}catch(e){}loading();await loadAll();if(!S.plan.length&&S.recipes.length)await gen();S.page='home';shell()}
-async function abrir(id){loading();const{data:p,error}=await sb.from('profiles').select('*').eq('id',id).maybeSingle();if(error||!p){toast('Perfil não encontrado.',1);return telaPessoas()}abrirP(p)}
-function telaPessoas(){app.innerHTML=`<div class="auth" style="max-width:760px"><div class="logo">${LOGO}Diet's</div><h2>Quem está usando?</h2><p class="mut">Os perfis são abertos: escolha um para ver a dieta ou crie o seu.</p><div id="pl"></div>${disc()}</div>`;loadPessoas()}
-async function loadPessoas(){const{data,error}=await sb.from('profiles').select('id,nome,objetivo,peso').order('nome');const el=$('#pl');if(!el)return;if(error)return el.innerHTML=`<p class="mut">${esc(error.message)}</p>`;el.innerHTML=`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">${(data||[]).map(p=>`<div class="card" onclick="abrir('${p.id}')" style="cursor:pointer;${S.user?.id==p.id?'outline:2px solid var(--g)':''}"><b>👤 ${esc(p.nome)}</b><div class="mut">${OBJ[p.objetivo]||''} · ${p.peso} kg</div></div>`).join('')}<div class="card" onclick="novo()" style="cursor:pointer;text-align:center"><b>➕ Novo perfil</b></div></div>`}
-function novo(){S.user={id:crypto.randomUUID?.()||'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c=='x'?r:r&3|8).toString(16)})};S.profile=null;S.plan=[];S.page='home';onboarding()}
+async function abrirP(p){S.user={id:p.id};S.profile=p;loading();await loadAll();if(!S.plan.length&&S.recipes.length)await gen();S.page='home';shell()}
 
 /* ---- Geração da dieta ---- */
 async function gen(){
@@ -153,11 +163,11 @@ const render_=()=>{shell()};
 /* ---- Interface ---- */
 function shell(){
   const it=[['home','🏠','Visão geral'],['dieta','🍽️','Dieta'],['receitas','📖','Receitas'],['compras','🛒','Compras'],['progresso','📈','Progresso'],['perfil','👤','Perfil']];
-  it.push(['pessoas','👥','Pessoas'],['admin','🛠️','Admin']);
+  if(S.profile?.is_admin)it.push(['admin','🛠️','Admin']);it.push(['sair','🚪','Sair']);
   app.innerHTML=`<div class="shell"><nav><div class="logo">${LOGO}Diet's</div>${it.map(([k,i,n])=>`<a id="n-${k}" onclick="go('${k}')">${i}<span>${n}</span></a>`).join('')}</nav><main id="main"></main></div>`;
   go(S.page||'home');
 }
-const go=p=>{S.page=p;render();scrollTo(0,0)};
+const go=p=>{if(p=='sair')return sair();S.page=p;render();scrollTo(0,0)};
 function render(){const m=$('#main');m.style.animation='none';m.offsetHeight;m.style.animation='';m.innerHTML=P[S.page]();document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.id=='n-'+S.page))}
 
 function mealRow(m,sw){
@@ -209,9 +219,8 @@ perfil(){
   return`<h1>Meu perfil</h1><div class="grid">${[['Sua TMB',c.tmb+' kcal/dia'],['Gasto energético diário',c.tdee+' kcal'],['Meta calórica',c.meta+' kcal']].map(([a,b])=>`<div class="card k"><span class="mut">${a}</span><b>${b}</b></div>`).join('')}</div>
 <p class="mut">Sua TMB representa a quantidade aproximada de energia que seu corpo utiliza em repouso. Sua meta diária considera também seu nível de atividade e seu objetivo.</p>
 <div class="card" style="margin-top:14px"><b>IMC ${i.toFixed(1)} — ${cl}</b><div class="imc"><i style="left:${pos}%"></i></div><p class="mut">O IMC é apenas um indicador geral e não substitui avaliação profissional.</p></div>
-${pForm(p)}<p style="margin-top:14px;display:flex;gap:8px"><button onclick="saveProfile()">Salvar alterações</button><button class="s" onclick="go('pessoas')">Trocar de perfil</button></p>`+disc();
+${pForm(p)}<p style="margin-top:14px;display:flex;gap:8px"><button onclick="saveProfile()">Salvar alterações</button><button class="s" onclick="sair()">Sair</button></p>`+disc();
 },
-pessoas(){setTimeout(loadPessoas);return`<h1>Pessoas</h1><p class="mut">Todos os perfis são abertos: toque em um para ver a dieta.</p><div id="pl" style="margin-top:14px"></div>`},
 admin(){
   setTimeout(loadU);
   return`<h1>Painel administrativo</h1><div class="card" style="margin-top:14px"><h3>Receita</h3><div class="f"><input id="ai" type="hidden">
